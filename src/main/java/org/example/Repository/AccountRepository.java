@@ -13,38 +13,76 @@ public class AccountRepository {
         private static final String UPDATE_QUERY = "UPDATE Account SET nom = ?, solde = ?, dateDerniereMiseAJour = ? WHERE id = ?";
         private static final String CREATE_QUERY = "INSERT INTO Account (nom, solde, dateDerniereMiseAJour) VALUES (?, ?, ?)";
 
-        public List<List<Account>> selectAllAccountsPagination() {
-            List<List<Account>> pages = new ArrayList<>();
-            final int pageSize = 10;
 
-            try (Connection connection = ConnectionDatabase.createConnection();
-                 Statement statement = connection.createStatement()) {
+    public List<List<Account>> getAccountsPagination(Date dateHeure) {
+        List<List<Account>> pages = new ArrayList<>();
 
-                ResultSet resultSet = statement.executeQuery(SELECT_ALL_QUERY);
+        final int pageSize = 10;
+        int pageNumber = 0;
 
+        try (Connection connection = ConnectionDatabase.createConnection()) {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+            ResultSet resultSet = statement.executeQuery(SELECT_ALL_QUERY);
+            resultSet.last(); // Se positionner sur la dernière ligne pour obtenir le nombre total de lignes
+            int totalRows = resultSet.getRow();
+            resultSet.beforeFirst(); // Retourner au début
+
+            int pageCount = (int) Math.ceil((double) totalRows / pageSize);
+
+            while (pageNumber < pageCount) {
                 List<Account> currentPage = new ArrayList<>();
                 int count = 0;
 
-                while (resultSet.next()) {
-                    if (count == pageSize) {
-                        pages.add(currentPage);
-                        currentPage = new ArrayList<>();
-                        count = 0;
-                    }
+                while (resultSet.next() && count < pageSize) {
+                    Account account = new Account();
+                    double soldeA = account.getSolde();
+                    account.setSolde(soldeA);
+                    currentPage.add(account);
+                    count++;
                 }
 
-                if (!currentPage.isEmpty()) {
-                    pages.add(currentPage);
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
+                pages.add(currentPage);
+                pageNumber++;
             }
 
-            return pages;
+            resultSet.close();
+            statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
-        public Account getAccountById(int id) {
+        return pages;
+    }
+
+    public List<Double> getBalanceHistoryForAccountInTimeInterval(int accountId, Date startDate, Date endDate) {
+        List<Double> balanceHistory = new ArrayList<>();
+
+        try (Connection connection = ConnectionDatabase.createConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT solde FROM Transaction WHERE accountId = ? AND dateTransaction BETWEEN ? AND ? ORDER BY dateTransaction")) {
+
+            statement.setInt(1, accountId);
+            statement.setTimestamp(2, new Timestamp(startDate.getTime()));
+            statement.setTimestamp(3, new Timestamp(endDate.getTime()));
+
+            ResultSet resultSet = statement.executeQuery();
+
+            double currentBalance = 0.0;
+
+            while (resultSet.next()) {
+                double transactionAmount = resultSet.getDouble("solde");
+                currentBalance += transactionAmount;
+                balanceHistory.add(currentBalance);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return balanceHistory;
+    }
+
+    public Account getAccountById(int id) {
             Account account = null;
 
             try (Connection connection = ConnectionDatabase.createConnection();

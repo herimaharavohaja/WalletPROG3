@@ -53,14 +53,32 @@ public class Account {
         this.nom = nom;
     }
 
-    public double getSolde() {
-        return solde;
+    public double getSoldeA(Date dateHeure) {
+        double soldeA = solde; // Initialise le solde au solde actuel du compte
+
+        if (listeTransactions != null) {
+            for (Transaction transaction : listeTransactions) {
+                if (transaction.getDateTransaction().before(dateHeure) || transaction.getDateTransaction().equals(dateHeure)) {
+                    if (transaction.getTypeTransaction().equalsIgnoreCase("crédit")) {
+                        soldeA += transaction.getMontant(); // Supposant que getMontant() renvoie le montant crédité
+                    } else if (transaction.getTypeTransaction().equalsIgnoreCase("débit")) {
+                        soldeA -= transaction.getMontant(); // Supposant que getMontant() renvoie le montant débité
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
+
+        return soldeA;
     }
 
     public void setSolde(double solde) {
         this.solde = solde;
     }
-
+    public double getSolde() {
+        return solde;
+    }
     public Date getDateDerniereMiseAJour() {
         return dateDerniereMiseAJour;
     }
@@ -106,4 +124,7 @@ public class Account {
         dateDerniereMiseAJour = new Date();
         return this;
     }
+
+
+
 }

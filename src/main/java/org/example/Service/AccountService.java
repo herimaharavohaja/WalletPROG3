@@ -3,6 +3,7 @@ package org.example.Service;
 import org.example.Model.Account;
 import org.example.Repository.AccountRepository;
 
+import java.util.Date;
 import java.util.List;
 
 public class AccountService {
@@ -12,8 +13,12 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
-    public List<List<Account>> getAllAccountsPagination() {
-        return accountRepository.selectAllAccountsPagination();
+    public List<List<Account>> getAllAccountsPagination(Date dateHeure) {
+        return accountRepository.getAccountsPagination((java.sql.Date) dateHeure);
+    }
+
+    public List<Double> getBalanceHistoryForAccountInTimeInterval(int accountId, Date startDate, Date endDate) {
+        return accountRepository.getBalanceHistoryForAccountInTimeInterval(accountId, (java.sql.Date) startDate, (java.sql.Date) endDate);
     }
 
     public Account getAccountById(int id) {
