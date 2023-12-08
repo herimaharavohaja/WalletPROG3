@@ -24,9 +24,9 @@ public class AccountRepository {
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
             ResultSet resultSet = statement.executeQuery(SELECT_ALL_QUERY);
-            resultSet.last(); // Se positionner sur la dernière ligne pour obtenir le nombre total de lignes
+            resultSet.last();
             int totalRows = resultSet.getRow();
-            resultSet.beforeFirst(); // Retourner au début
+            resultSet.beforeFirst();
 
             int pageCount = (int) Math.ceil((double) totalRows / pageSize);
 
