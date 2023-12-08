@@ -4,20 +4,22 @@ import java.util.Date;
 import java.util.Objects;
 
 public class Transaction {
-    private int identifiant;
+    private int Id;
     private String label;
     private double montant;
     private Date dateTransaction;
     private String typeTransaction;
+    private Account account;
 
     @Override
     public String toString() {
         return "Transaction{" +
-                "identifiant=" + identifiant +
+                "Id=" + Id +
                 ", label='" + label + '\'' +
                 ", montant=" + montant +
                 ", dateTransaction=" + dateTransaction +
                 ", typeTransaction='" + typeTransaction + '\'' +
+                ", account=" + account +
                 '}';
     }
 
@@ -25,20 +27,20 @@ public class Transaction {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Transaction that)) return false;
-        return identifiant == that.identifiant && Double.compare(that.montant, montant) == 0 && Objects.equals(label, that.label) && Objects.equals(dateTransaction, that.dateTransaction) && Objects.equals(typeTransaction, that.typeTransaction);
+        return Id == that.Id && Double.compare(that.montant, montant) == 0 && Objects.equals(label, that.label) && Objects.equals(dateTransaction, that.dateTransaction) && Objects.equals(typeTransaction, that.typeTransaction) && Objects.equals(account, that.account);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(identifiant, label, montant, dateTransaction, typeTransaction);
+        return Objects.hash(Id, label, montant, dateTransaction, typeTransaction, account);
     }
 
-    public int getIdentifiant() {
-        return identifiant;
+    public int getId() {
+        return Id;
     }
 
-    public void setIdentifiant(int identifiant) {
-        this.identifiant = identifiant;
+    public void setId(int id) {
+        Id = id;
     }
 
     public String getLabel() {
@@ -71,5 +73,13 @@ public class Transaction {
 
     public void setTypeTransaction(String typeTransaction) {
         this.typeTransaction = typeTransaction;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
     }
 }

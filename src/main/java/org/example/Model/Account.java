@@ -1,6 +1,8 @@
 package org.example.Model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 public class Account {
@@ -9,6 +11,7 @@ public class Account {
     private double solde;
     private Date dateDerniereMiseAJour;
     private Devise devise;
+    private List<Transaction> listeTransactions;
 
     @Override
     public String toString() {
@@ -18,6 +21,7 @@ public class Account {
                 ", solde=" + solde +
                 ", dateDerniereMiseAJour=" + dateDerniereMiseAJour +
                 ", devise=" + devise +
+                ", listeTransactions=" + listeTransactions +
                 '}';
     }
 
@@ -25,12 +29,12 @@ public class Account {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Account account)) return false;
-        return Id == account.Id && Double.compare(account.solde, solde) == 0 && Objects.equals(nom, account.nom) && Objects.equals(dateDerniereMiseAJour, account.dateDerniereMiseAJour) && Objects.equals(devise, account.devise);
+        return Id == account.Id && Double.compare(account.solde, solde) == 0 && Objects.equals(nom, account.nom) && Objects.equals(dateDerniereMiseAJour, account.dateDerniereMiseAJour) && Objects.equals(devise, account.devise) && Objects.equals(listeTransactions, account.listeTransactions);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(Id, nom, solde, dateDerniereMiseAJour, devise);
+        return Objects.hash(Id, nom, solde, dateDerniereMiseAJour, devise, listeTransactions);
     }
 
     public int getId() {
@@ -71,5 +75,35 @@ public class Account {
 
     public void setDevise(Devise devise) {
         this.devise = devise;
+    }
+
+    public List<Transaction> getListeTransactions() {
+        return listeTransactions;
+    }
+
+    public void setListeTransactions(List<Transaction> listeTransactions) {
+        this.listeTransactions = listeTransactions;
+    }
+    public Account effectuerTransaction(Transaction transaction) {
+        transaction.setDateTransaction(new Date());
+        if (transaction.getTypeTransaction().equalsIgnoreCase("débit")) {
+            if (transaction.getMontant() > solde) {
+                System.out.println("Solde insuffisant pour effectuer cette transaction.");
+                return this;
+            } else {
+                solde -= transaction.getMontant();
+            }
+        } else if (transaction.getTypeTransaction().equalsIgnoreCase("crédit")) {
+            solde += transaction.getMontant();
+        } else {
+            System.out.println("Type de transaction non valide.");
+            return this;
+        }
+        if (listeTransactions == null) {
+            listeTransactions = new ArrayList<>();
+        }
+        listeTransactions.add(transaction);
+        dateDerniereMiseAJour = new Date();
+        return this;
     }
 }
