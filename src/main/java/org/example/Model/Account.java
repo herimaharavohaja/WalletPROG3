@@ -54,15 +54,15 @@ public class Account {
     }
 
     public double getSoldeA(Date dateHeure) {
-        double soldeA = solde; // Initialise le solde au solde actuel du compte
+        double soldeA = solde;
 
         if (listeTransactions != null) {
             for (Transaction transaction : listeTransactions) {
                 if (transaction.getDateTransaction().before(dateHeure) || transaction.getDateTransaction().equals(dateHeure)) {
                     if (transaction.getTypeTransaction().equalsIgnoreCase("crédit")) {
-                        soldeA += transaction.getMontant(); // Supposant que getMontant() renvoie le montant crédité
+                        soldeA += transaction.getMontant();
                     } else if (transaction.getTypeTransaction().equalsIgnoreCase("débit")) {
-                        soldeA -= transaction.getMontant(); // Supposant que getMontant() renvoie le montant débité
+                        soldeA -= transaction.getMontant();
                     }
                 } else {
                     break;
