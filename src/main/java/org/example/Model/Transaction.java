@@ -1,14 +1,16 @@
 package org.example.Model;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Objects;
 
 public class Transaction {
     private int Id;
     private String label;
-    private double montant;
-    private Date dateTransaction;
-    private String typeTransaction;
+    private BigDecimal montant;
+    private LocalDateTime dateHeure;
+    private String type;
     private Account account;
 
     @Override
@@ -17,8 +19,8 @@ public class Transaction {
                 "Id=" + Id +
                 ", label='" + label + '\'' +
                 ", montant=" + montant +
-                ", dateTransaction=" + dateTransaction +
-                ", typeTransaction='" + typeTransaction + '\'' +
+                ", dateHeure=" + dateHeure +
+                ", type='" + type + '\'' +
                 ", account=" + account +
                 '}';
     }
@@ -27,12 +29,12 @@ public class Transaction {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Transaction that)) return false;
-        return Id == that.Id && Double.compare(that.montant, montant) == 0 && Objects.equals(label, that.label) && Objects.equals(dateTransaction, that.dateTransaction) && Objects.equals(typeTransaction, that.typeTransaction) && Objects.equals(account, that.account);
+        return Id == that.Id && Objects.equals(label, that.label) && Objects.equals(montant, that.montant) && Objects.equals(dateHeure, that.dateHeure) && Objects.equals(type, that.type) && Objects.equals(account, that.account);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(Id, label, montant, dateTransaction, typeTransaction, account);
+        return Objects.hash(Id, label, montant, dateHeure, type, account);
     }
 
     public int getId() {
@@ -51,28 +53,28 @@ public class Transaction {
         this.label = label;
     }
 
-    public double getMontant() {
+    public BigDecimal getMontant() {
         return montant;
     }
 
-    public void setMontant(double montant) {
+    public void setMontant(BigDecimal montant) {
         this.montant = montant;
     }
 
-    public Date getDateTransaction() {
-        return dateTransaction;
+    public LocalDateTime getDateHeure() {
+        return dateHeure;
     }
 
-    public void setDateTransaction(Date dateTransaction) {
-        this.dateTransaction = dateTransaction;
+    public void setDateHeure(LocalDateTime dateHeure) {
+        this.dateHeure = dateHeure;
     }
 
-    public String getTypeTransaction() {
-        return typeTransaction;
+    public String getType() {
+        return type;
     }
 
-    public void setTypeTransaction(String typeTransaction) {
-        this.typeTransaction = typeTransaction;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public Account getAccount() {

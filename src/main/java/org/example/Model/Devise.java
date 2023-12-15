@@ -6,7 +6,6 @@ public class Devise {
     private int Id;
     private String nom;
     private String code;
-    private String Type;
 
     @Override
     public String toString() {
@@ -14,7 +13,6 @@ public class Devise {
                 "Id=" + Id +
                 ", nom='" + nom + '\'' +
                 ", code='" + code + '\'' +
-                ", Type='" + Type + '\'' +
                 '}';
     }
 
@@ -22,12 +20,12 @@ public class Devise {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Devise devise)) return false;
-        return Id == devise.Id && Objects.equals(nom, devise.nom) && Objects.equals(code, devise.code) && Objects.equals(Type, devise.Type);
+        return Id == devise.Id && Objects.equals(nom, devise.nom) && Objects.equals(code, devise.code);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(Id, nom, code, Type);
+        return Objects.hash(Id, nom, code);
     }
 
     public int getId() {
@@ -52,13 +50,5 @@ public class Devise {
 
     public void setCode(String code) {
         this.code = code;
-    }
-
-    public String getType() {
-        return Type;
-    }
-
-    public void setType(String type) {
-        Type = type;
     }
 }

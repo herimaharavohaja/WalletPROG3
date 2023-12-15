@@ -1,21 +1,24 @@
 package org.example.Model;
 
-import java.util.Date;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class CurrencyValue {
     private int id;
-    private Devise devise;
-    private double value;
-    private Date date;
+    private int deviseSourceId;
+    private int deviseDestinationId;
+    private BigDecimal montant;
+    private LocalDateTime dateEffet;
 
     @Override
     public String toString() {
         return "CurrencyValue{" +
                 "id=" + id +
-                ", devise=" + devise +
-                ", value=" + value +
-                ", date=" + date +
+                ", deviseSourceId=" + deviseSourceId +
+                ", deviseDestinationId=" + deviseDestinationId +
+                ", montant=" + montant +
+                ", dateEffet=" + dateEffet +
                 '}';
     }
 
@@ -23,12 +26,12 @@ public class CurrencyValue {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof CurrencyValue that)) return false;
-        return id == that.id && Double.compare(that.value, value) == 0 && Objects.equals(devise, that.devise) && Objects.equals(date, that.date);
+        return id == that.id && deviseSourceId == that.deviseSourceId && deviseDestinationId == that.deviseDestinationId && Objects.equals(montant, that.montant) && Objects.equals(dateEffet, that.dateEffet);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, devise, value, date);
+        return Objects.hash(id, deviseSourceId, deviseDestinationId, montant, dateEffet);
     }
 
     public int getId() {
@@ -39,27 +42,35 @@ public class CurrencyValue {
         this.id = id;
     }
 
-    public Devise getDevise() {
-        return devise;
+    public int getDeviseSourceId() {
+        return deviseSourceId;
     }
 
-    public void setDevise(Devise devise) {
-        this.devise = devise;
+    public void setDeviseSourceId(int deviseSourceId) {
+        this.deviseSourceId = deviseSourceId;
     }
 
-    public double getValue() {
-        return value;
+    public int getDeviseDestinationId() {
+        return deviseDestinationId;
     }
 
-    public void setValue(double value) {
-        this.value = value;
+    public void setDeviseDestinationId(int deviseDestinationId) {
+        this.deviseDestinationId = deviseDestinationId;
     }
 
-    public Date getDate() {
-        return date;
+    public BigDecimal getMontant() {
+        return montant;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setMontant(BigDecimal montant) {
+        this.montant = montant;
+    }
+
+    public LocalDateTime getDateEffet() {
+        return dateEffet;
+    }
+
+    public void setDateEffet(LocalDateTime dateEffet) {
+        this.dateEffet = dateEffet;
     }
 }

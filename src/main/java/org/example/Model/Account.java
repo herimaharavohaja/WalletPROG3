@@ -1,17 +1,15 @@
 package org.example.Model;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Account {
     private int Id;
     private String nom;
-    private double solde;
-    private Date dateDerniereMiseAJour;
+    private BigDecimal solde;
+    private LocalDateTime dateMajSolde;
     private Devise devise;
-    private List<Transaction> listeTransactions;
 
     @Override
     public String toString() {
@@ -19,9 +17,8 @@ public class Account {
                 "Id=" + Id +
                 ", nom='" + nom + '\'' +
                 ", solde=" + solde +
-                ", dateDerniereMiseAJour=" + dateDerniereMiseAJour +
+                ", dateMajSolde=" + dateMajSolde +
                 ", devise=" + devise +
-                ", listeTransactions=" + listeTransactions +
                 '}';
     }
 
@@ -29,12 +26,12 @@ public class Account {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Account account)) return false;
-        return Id == account.Id && Double.compare(account.solde, solde) == 0 && Objects.equals(nom, account.nom) && Objects.equals(dateDerniereMiseAJour, account.dateDerniereMiseAJour) && Objects.equals(devise, account.devise) && Objects.equals(listeTransactions, account.listeTransactions);
+        return Id == account.Id && Objects.equals(nom, account.nom) && Objects.equals(solde, account.solde) && Objects.equals(dateMajSolde, account.dateMajSolde) && Objects.equals(devise, account.devise);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(Id, nom, solde, dateDerniereMiseAJour, devise, listeTransactions);
+        return Objects.hash(Id, nom, solde, dateMajSolde, devise);
     }
 
     public int getId() {
@@ -53,38 +50,20 @@ public class Account {
         this.nom = nom;
     }
 
-    public double getSoldeA(Date dateHeure) {
-        double soldeA = solde;
-
-        if (listeTransactions != null) {
-            for (Transaction transaction : listeTransactions) {
-                if (transaction.getDateTransaction().before(dateHeure) || transaction.getDateTransaction().equals(dateHeure)) {
-                    if (transaction.getTypeTransaction().equalsIgnoreCase("crédit")) {
-                        soldeA += transaction.getMontant();
-                    } else if (transaction.getTypeTransaction().equalsIgnoreCase("débit")) {
-                        soldeA -= transaction.getMontant();
-                    }
-                } else {
-                    break;
-                }
-            }
-        }
-
-        return soldeA;
-    }
-
-    public void setSolde(double solde) {
-        this.solde = solde;
-    }
-    public double getSolde() {
+    public BigDecimal getSolde() {
         return solde;
     }
-    public Date getDateDerniereMiseAJour() {
-        return dateDerniereMiseAJour;
+
+    public void setSolde(BigDecimal solde) {
+        this.solde = solde;
     }
 
-    public void setDateDerniereMiseAJour(Date dateDerniereMiseAJour) {
-        this.dateDerniereMiseAJour = dateDerniereMiseAJour;
+    public LocalDateTime getDateMajSolde() {
+        return dateMajSolde;
+    }
+
+    public void setDateMajSolde(LocalDateTime dateMajSolde) {
+        this.dateMajSolde = dateMajSolde;
     }
 
     public Devise getDevise() {
@@ -94,37 +73,5 @@ public class Account {
     public void setDevise(Devise devise) {
         this.devise = devise;
     }
-
-    public List<Transaction> getListeTransactions() {
-        return listeTransactions;
-    }
-
-    public void setListeTransactions(List<Transaction> listeTransactions) {
-        this.listeTransactions = listeTransactions;
-    }
-    public Account effectuerTransaction(Transaction transaction) {
-        transaction.setDateTransaction(new Date());
-        if (transaction.getTypeTransaction().equalsIgnoreCase("débit")) {
-            if (transaction.getMontant() > solde) {
-                System.out.println("Solde insuffisant pour effectuer cette transaction.");
-                return this;
-            } else {
-                solde -= transaction.getMontant();
-            }
-        } else if (transaction.getTypeTransaction().equalsIgnoreCase("crédit")) {
-            solde += transaction.getMontant();
-        } else {
-            System.out.println("Type de transaction non valide.");
-            return this;
-        }
-        if (listeTransactions == null) {
-            listeTransactions = new ArrayList<>();
-        }
-        listeTransactions.add(transaction);
-        dateDerniereMiseAJour = new Date();
-        return this;
-    }
-
-
 
 }
