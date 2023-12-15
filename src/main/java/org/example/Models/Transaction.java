@@ -19,6 +19,10 @@ public class Transaction {
         this.account = account;
     }
 
+    public Transaction() {
+
+    }
+
     @Override
     public String toString() {
         return "Transaction{" +

@@ -1,14 +1,18 @@
-package org.example.repository;
+
+import org.example.Connection.ConnectionDatabase;
+import org.example.Models.Account;
+import org.example.Models.Transaction;
+import org.example.Repositor.InterfaceRepository;
+
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class TransactionRepository implements InterfaceRepository<Transaction> {
 
     @Override
-    public Transaction findById(int toFind) {
-        // Implémentez la logique pour trouver une transaction par son ID dans la base de données
-        // Utilisez PreparedStatement pour exécuter une requête sécurisée
+    public Account findById(int toFind) {
         return null;
     }
 
@@ -67,6 +71,24 @@ public class TransactionRepository implements InterfaceRepository<Transaction> {
             throw new RuntimeException("Failed to save transaction : " + e.getMessage());
         }
         return toSave;
+    }
+
+    @Override
+    public void closeResources(Connection connection, PreparedStatement statement, ResultSet resultSet) {
+
+        try {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (statement != null) {
+                statement.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to close resources: " + e.getMessage());
+        }
     }
 
 }

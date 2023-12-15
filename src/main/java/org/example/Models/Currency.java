@@ -13,6 +13,10 @@ public class Currency {
         this.currencyCode = currencyCode;
     }
 
+    public Currency() {
+
+    }
+
     @Override
     public String toString() {
         return "Currency{" +

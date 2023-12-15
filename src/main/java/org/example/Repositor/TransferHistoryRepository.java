@@ -1,9 +1,8 @@
-package org.example.repository;
+package org.example.Repositor;
 
 import org.example.Connection.ConnectionDatabase;
+import org.example.Models.Account;
 import org.example.Models.TransferHistory;
-import org.example.Repositor.InterfaceRepository;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +11,7 @@ import java.util.List;
 public class TransferHistoryRepository implements InterfaceRepository<TransferHistory> {
 
     @Override
-    public TransferHistory findById(int toFind) {
+    public Account findById(int toFind) {
         return null;
     }
 

@@ -12,7 +12,7 @@ import java.util.List;
 public class CurrencyRepository implements InterfaceRepository<Currency> {
 
     @Override
-    public Currency findById(int toFind) {
+    public Account findById(int toFind) {
         return null;
     }
     @Override
