@@ -4,18 +4,16 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class TransferHistory {
-    private int Id;
-    private int transactionDebitId;
-    private int TransactionCreditId;
-    private LocalDateTime dateTransfer;
+    private int id;
+    private int transferId;
+    private LocalDateTime dateTransfert;
 
     @Override
     public String toString() {
         return "TransferHistory{" +
-                "Id=" + Id +
-                ", transactionDebitId=" + transactionDebitId +
-                ", TransactionCreditId=" + TransactionCreditId +
-                ", dateTransfer=" + dateTransfer +
+                "id=" + id +
+                ", transferId=" + transferId +
+                ", dateTransfert=" + dateTransfert +
                 '}';
     }
 
@@ -23,43 +21,35 @@ public class TransferHistory {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof TransferHistory that)) return false;
-        return Id == that.Id && transactionDebitId == that.transactionDebitId && TransactionCreditId == that.TransactionCreditId && Objects.equals(dateTransfer, that.dateTransfer);
+        return id == that.id && transferId == that.transferId && Objects.equals(dateTransfert, that.dateTransfert);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(Id, transactionDebitId, TransactionCreditId, dateTransfer);
+        return Objects.hash(id, transferId, dateTransfert);
     }
 
     public int getId() {
-        return Id;
+        return id;
     }
 
     public void setId(int id) {
-        Id = id;
+        this.id = id;
     }
 
-    public int getTransactionDebitId() {
-        return transactionDebitId;
+    public int getTransferId() {
+        return transferId;
     }
 
-    public void setTransactionDebitId(int transactionDebitId) {
-        this.transactionDebitId = transactionDebitId;
+    public void setTransferId(int transferId) {
+        this.transferId = transferId;
     }
 
-    public int getTransactionCreditId() {
-        return TransactionCreditId;
+    public LocalDateTime getDateTransfert() {
+        return dateTransfert;
     }
 
-    public void setTransactionCreditId(int transactionCreditId) {
-        TransactionCreditId = transactionCreditId;
-    }
-
-    public LocalDateTime getDateTransfer() {
-        return dateTransfer;
-    }
-
-    public void setDateTransfer(LocalDateTime dateTransfer) {
-        this.dateTransfer = dateTransfer;
+    public void setDateTransfert(LocalDateTime dateTransfert) {
+        this.dateTransfert = dateTransfert;
     }
 }

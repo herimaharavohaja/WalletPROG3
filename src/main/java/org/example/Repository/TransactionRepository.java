@@ -1,9 +1,13 @@
 package org.example.Repository;
 
 import org.example.Connection.ConnectionDatabase;
+import org.example.Model.Account;
 import org.example.Model.Transaction;
+import org.example.Model.TransactionType;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TransactionRepository {
     private Connection connection;
@@ -54,5 +58,45 @@ public class TransactionRepository {
         }
         return null;
     }
+    public List<Transaction> getAll() throws SQLException {
+        List<Transaction> transactions = new ArrayList<>();
+        String query = "SELECT * FROM Transaction";
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()) {
+                transactions.add(mapResultSetToTransaction(resultSet));
+            }
+        }
+        return transactions;
+    }
+    public List<Transaction> getAllPagination(int pageNumber) throws SQLException {
+        List<Transaction> transactions = new ArrayList<>();
+        int limit = 10;
+        int offset = (pageNumber - 1) * limit;
 
+        String query = "SELECT * FROM Transaction LIMIT ? OFFSET ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, limit);
+            statement.setInt(2, offset);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                transactions.add(mapResultSetToTransaction(resultSet));
+            }
+        }
+        return transactions;
+    }
+    private Transaction mapResultSetToTransaction(ResultSet resultSet) throws SQLException {
+        Transaction transaction = new Transaction();
+        transaction.setId(resultSet.getInt("ID"));
+        transaction.setLabel(resultSet.getString("Label"));
+        transaction.setMontant(resultSet.getBigDecimal("Montant"));
+        transaction.setDateHeure(resultSet.getTimestamp("Date_heure").toLocalDateTime());
+        transaction.setTransactionType(TransactionType.valueOf(resultSet.getString("Type")));
+
+        Account account = new Account();
+        account.setId(resultSet.getInt("Compte_ID"));
+        transaction.setAccount(account);
+
+        return transaction;
+    }
 }

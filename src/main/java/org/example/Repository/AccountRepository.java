@@ -17,7 +17,7 @@ public class AccountRepository {
     }
 
     public void create(Account account) throws SQLException {
-        String query = "INSERT INTO Compte (Nom, Solde, Date_maj_solde, Devise_ID) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO Account (Nom, Solde, Date_maj_solde, Devise_ID) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, account.getNom());
             statement.setBigDecimal(2, account.getSolde());
@@ -30,12 +30,12 @@ public class AccountRepository {
             if (generatedKeys.next()) {
                 account.setId(generatedKeys.getInt(1));
             } else {
-                throw new SQLException("Creating Compte failed, no ID obtained.");
+                throw new SQLException("Creating Account failed, no ID obtained.");
             }
         }
     }
     public void update(Account account) throws SQLException {
-        String query = "UPDATE Compte SET Nom = ?, Solde = ?, Date_maj_solde = ?, Devise_ID = ? WHERE ID = ?";
+        String query = "UPDATE Account SET Nom = ?, Solde = ?, Date_maj_solde = ?, Devise_ID = ? WHERE ID = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, account.getNom());
             statement.setBigDecimal(2, account.getSolde());
@@ -50,7 +50,7 @@ public class AccountRepository {
 
 
     public Account getById(int id) throws SQLException {
-        String query = "SELECT * FROM Compte WHERE ID = ?";
+        String query = "SELECT * FROM Account WHERE ID = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
@@ -63,7 +63,7 @@ public class AccountRepository {
 
     public List<Account> getAll() throws SQLException {
         List<Account> comptes = new ArrayList<>();
-        String query = "SELECT * FROM Compte";
+        String query = "SELECT * FROM Account";
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
@@ -75,7 +75,7 @@ public class AccountRepository {
 
     public List<Account> getAllPagination(int offset, int limit) throws SQLException {
         List<Account> comptes = new ArrayList<>();
-        String query = "SELECT * FROM Compte LIMIT ? OFFSET ?";
+        String query = "SELECT * FROM Account LIMIT ? OFFSET ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, limit);
             statement.setInt(2, offset);

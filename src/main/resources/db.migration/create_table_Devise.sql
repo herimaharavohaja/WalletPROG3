@@ -1,0 +1,5 @@
+CREATE TABLE Devise (
+    ID SERIAL PRIMARY KEY,
+    Nom VARCHAR(100),
+    Code VARCHAR(10)
+);
