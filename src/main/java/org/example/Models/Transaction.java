@@ -1,7 +1,4 @@
 package org.example.Models;
-
-import com.walletbyhei.model.type.TransactionType;
-
 import java.time.LocalDateTime;
 import java.util.Objects;
 

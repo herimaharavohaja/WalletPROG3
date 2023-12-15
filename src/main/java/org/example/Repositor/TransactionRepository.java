@@ -1,16 +1,14 @@
 package org.example.repository;
-import org.example.Connection.ConnectionDatabase;
-import org.example.Models.Transaction;
-import org.example.Repositor.InterfaceRepository;
-
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
+
 
 public class TransactionRepository implements InterfaceRepository<Transaction> {
 
     @Override
     public Transaction findById(int toFind) {
+        // Implémentez la logique pour trouver une transaction par son ID dans la base de données
+        // Utilisez PreparedStatement pour exécuter une requête sécurisée
         return null;
     }
 
@@ -18,20 +16,17 @@ public class TransactionRepository implements InterfaceRepository<Transaction> {
     public List<Transaction> findAll() {
         List<Transaction> transactions = new ArrayList<>();
 
-        Connection connection = ConnectionDatabase.getConnection();
-        String SELECT_ALL_QUERY = "SELECT * FROM \"transaction\"";
-
-        try (PreparedStatement statement = connection.prepareStatement(SELECT_ALL_QUERY)) {
-            ResultSet resultSet = statement.executeQuery();
+        try (Connection connection = ConnectionDatabase.getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM transactions");
+             ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
                 Transaction transaction = new Transaction();
+                // Initialisez les propriétés de la transaction à partir des données ResultSet
                 transactions.add(transaction);
             }
         } catch (SQLException e) {
             throw new RuntimeException("Failed to retrieve all transactions : " + e.getMessage());
-        } finally {
-            closeResources(connection, null, null);
         }
         return transactions;
     }
@@ -50,90 +45,28 @@ public class TransactionRepository implements InterfaceRepository<Transaction> {
 
     @Override
     public Transaction save(Transaction toSave) {
-        Connection connection = null;
-        PreparedStatement statement = null;
-        ResultSet resultSet = null;
-
-        try {
-            connection = ConnectionDatabase.getConnection();
-            String SAVE_QUERY;
-
+        try (Connection connection = ConnectionDatabase.getConnection()) {
+            String saveQuery;
             if (toSave.getTransactionId() == null) {
-                SAVE_QUERY =
-                        "INSERT INTO \"transaction\" (label, amount, transaction_date_time, account_id,"
-                                + " transaction_type) VALUES(?, ?, ?, ?, CAST(? AS transaction_type)) RETURNING *";
-                statement = connection.prepareStatement(SAVE_QUERY, Statement.RETURN_GENERATED_KEYS);
-                statement.setString(1, toSave.getLabel());
-                statement.setDouble(2, toSave.getAmount());
-                statement.setTimestamp(3, Timestamp.valueOf(toSave.getDateTime()));
-                statement.setInt(4, Math.toIntExact(toSave.getAccount().getAccountId()));
-                statement.setString(5, String.valueOf(toSave.getTransactionType()));
-                statement.executeUpdate();
-
-                resultSet = statement.getGeneratedKeys();
+                saveQuery = "INSERT INTO transactions (label, amount, transaction_date_time, account_id, transaction_type) " +
+                        "VALUES (?, ?, ?, ?, ?::transaction_type) RETURNING *";
+                try (PreparedStatement statement = connection.prepareStatement(saveQuery, Statement.RETURN_GENERATED_KEYS)) {
+                    // Paramétrisez les valeurs pour l'insertion
+                    statement.executeUpdate();
+                    // Récupérez les clés générées si nécessaire
+                }
             } else {
-                SAVE_QUERY =
-                        "UPDATE \"transaction\" SET label = ?, amount = ?, transaction_date_time = ?,"
-                                + " account_id = ? , transaction_type = CAST(? AS account_type)WHERE transaction_id"
-                                + " = ? RETURNING *";
-                statement = connection.prepareStatement(SAVE_QUERY);
-                statement.setString(1, toSave.getLabel());
-                statement.setDouble(2, toSave.getAmount());
-                statement.setTimestamp(3, Timestamp.valueOf(toSave.getDateTime()));
-                statement.setInt(4, Math.toIntExact(toSave.getAccount().getAccountId()));
-                statement.setString(5, String.valueOf(toSave.getTransactionType()));
-                statement.setLong(6, toSave.getTransactionId());
-                statement.executeUpdate();
-            }
-
-            if (resultSet != null && resultSet.next()) {
-                toSave.setTransactionId(resultSet.getLong(1));
+                saveQuery = "UPDATE transactions SET label = ?, amount = ?, transaction_date_time = ?, " +
+                        "account_id = ?, transaction_type = ?::account_type WHERE transaction_id = ? RETURNING *";
+                try (PreparedStatement statement = connection.prepareStatement(saveQuery)) {
+                    // Paramétrisez les valeurs pour la mise à jour
+                    statement.executeUpdate();
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException("Failed to save transaction : " + e.getMessage());
-        } finally {
-            closeResources(connection, statement, resultSet);
         }
         return toSave;
     }
 
-
-
-    @Override
-    public Transaction delete(Transaction toDelete) {
-        Connection connection = null;
-        PreparedStatement statement = null;
-
-        try {
-            connection = ConnectionDatabase.getConnection();
-            String DELETE_QUERY = "DELETE FROM \"transaction\" WHERE transaction_id = ?";
-            statement = connection.prepareStatement(DELETE_QUERY);
-            statement.setLong(1, toDelete.getTransactionId());
-            statement.executeUpdate();
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to delete transaction : " + e.getMessage());
-        } finally {
-            closeResources(connection, statement, null);
-        }
-        return toDelete;
-    }
-
-    @Override
-    public void closeResources(
-            Connection connection, PreparedStatement statement, ResultSet resultSet) {
-        try {
-            if (resultSet != null) {
-                resultSet.close();
-            }
-            if (statement != null) {
-                statement.close();
-            }
-            if (connection != null) {
-                connection.close();
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to close resources: " + e.getMessage());
-        }
-    }
 }
