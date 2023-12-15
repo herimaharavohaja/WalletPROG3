@@ -18,6 +18,9 @@ public class TransferHistory {
         this.transferDate = transferDate;
     }
 
+    public TransferHistory() {;
+    }
+
     @Override
     public String toString() {
         return "TransferHistory{" +

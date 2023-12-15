@@ -1,10 +1,8 @@
-package org.example.repository;
+package org.example.Repositor;
 
 import org.example.Connection.ConnectionDatabase;
 import org.example.Models.Account;
 import org.example.Models.Currency;
-import org.example.Repositor.InterfaceRepository;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;

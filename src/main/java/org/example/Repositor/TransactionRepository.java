@@ -1,9 +1,8 @@
+package org.example.Repositor;
 
 import org.example.Connection.ConnectionDatabase;
 import org.example.Models.Account;
 import org.example.Models.Transaction;
-import org.example.Repositor.InterfaceRepository;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
