@@ -10,7 +10,7 @@ public class Transaction {
     private String label;
     private BigDecimal montant;
     private LocalDateTime dateHeure;
-    private String type;
+    private TransactionType transactionType;
     private Account account;
 
     @Override
@@ -20,7 +20,7 @@ public class Transaction {
                 ", label='" + label + '\'' +
                 ", montant=" + montant +
                 ", dateHeure=" + dateHeure +
-                ", type='" + type + '\'' +
+                ", transactionType=" + transactionType +
                 ", account=" + account +
                 '}';
     }
@@ -29,12 +29,12 @@ public class Transaction {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Transaction that)) return false;
-        return Id == that.Id && Objects.equals(label, that.label) && Objects.equals(montant, that.montant) && Objects.equals(dateHeure, that.dateHeure) && Objects.equals(type, that.type) && Objects.equals(account, that.account);
+        return Id == that.Id && Objects.equals(label, that.label) && Objects.equals(montant, that.montant) && Objects.equals(dateHeure, that.dateHeure) && transactionType == that.transactionType && Objects.equals(account, that.account);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(Id, label, montant, dateHeure, type, account);
+        return Objects.hash(Id, label, montant, dateHeure, transactionType, account);
     }
 
     public int getId() {
@@ -69,12 +69,12 @@ public class Transaction {
         this.dateHeure = dateHeure;
     }
 
-    public String getType() {
-        return type;
+    public TransactionType getTransactionType() {
+        return transactionType;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setTransactionType(TransactionType transactionType) {
+        this.transactionType = transactionType;
     }
 
     public Account getAccount() {

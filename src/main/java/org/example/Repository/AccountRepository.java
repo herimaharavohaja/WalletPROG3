@@ -2,6 +2,7 @@ package org.example.Repository;
 
 import org.example.Connection.ConnectionDatabase;
 import org.example.Model.Account;
+import org.example.Model.AccountType;
 import org.example.Model.Devise;
 
 import java.sql.*;
@@ -16,12 +17,13 @@ public class AccountRepository {
     }
 
     public void create(Account account) throws SQLException {
-        String query = "INSERT INTO Compte (Nom, Solde, Date_maj_solde, Devise_ID) VALUES (?, ?, ?, ?)";
+        String query = "INSERT INTO Compte (Nom, Solde, Date_maj_solde, Devise_ID) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, account.getNom());
             statement.setBigDecimal(2, account.getSolde());
             statement.setTimestamp(3, Timestamp.valueOf(account.getDateMajSolde()));
-            statement.setInt(4, account.getDevise().getId());
+            statement.setString(4, account.getTypeAccount().toString());
+            statement.setInt(5, account.getDevise().getId());
 
             statement.executeUpdate();
             ResultSet generatedKeys = statement.getGeneratedKeys();
@@ -38,6 +40,7 @@ public class AccountRepository {
             statement.setString(1, account.getNom());
             statement.setBigDecimal(2, account.getSolde());
             statement.setTimestamp(3, Timestamp.valueOf(account.getDateMajSolde()));
+            statement.setString(5, account.getTypeAccount().toString());
             statement.setInt(4, account.getDevise().getId());
             statement.setInt(5, account.getId());
 
@@ -91,6 +94,7 @@ public class AccountRepository {
         account.setNom(resultSet.getString("Nom"));
         account.setSolde(resultSet.getBigDecimal("Solde"));
         account.setDateMajSolde(resultSet.getTimestamp("Date_maj_solde").toLocalDateTime());
+        account.setTypeAccount(AccountType.valueOf(resultSet.getString("Type").toString()));
 
         Devise devise = new Devise();
         devise.setId(resultSet.getInt("Devise_ID"));

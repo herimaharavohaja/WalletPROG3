@@ -9,6 +9,7 @@ public class Account {
     private String nom;
     private BigDecimal solde;
     private LocalDateTime dateMajSolde;
+    private AccountType typeAccount;
     private Devise devise;
 
     @Override
@@ -18,6 +19,7 @@ public class Account {
                 ", nom='" + nom + '\'' +
                 ", solde=" + solde +
                 ", dateMajSolde=" + dateMajSolde +
+                ", typeAccount=" + typeAccount +
                 ", devise=" + devise +
                 '}';
     }
@@ -26,12 +28,12 @@ public class Account {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Account account)) return false;
-        return Id == account.Id && Objects.equals(nom, account.nom) && Objects.equals(solde, account.solde) && Objects.equals(dateMajSolde, account.dateMajSolde) && Objects.equals(devise, account.devise);
+        return Id == account.Id && Objects.equals(nom, account.nom) && Objects.equals(solde, account.solde) && Objects.equals(dateMajSolde, account.dateMajSolde) && typeAccount == account.typeAccount && Objects.equals(devise, account.devise);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(Id, nom, solde, dateMajSolde, devise);
+        return Objects.hash(Id, nom, solde, dateMajSolde, typeAccount, devise);
     }
 
     public int getId() {
@@ -65,6 +67,12 @@ public class Account {
     public void setDateMajSolde(LocalDateTime dateMajSolde) {
         this.dateMajSolde = dateMajSolde;
     }
+    public AccountType getTypeAccount() {
+        return this.typeAccount;
+    }
+    public void setTypeAccount(AccountType typeAccount) {
+        this.typeAccount = typeAccount;
+    }
 
     public Devise getDevise() {
         return devise;
@@ -73,5 +81,7 @@ public class Account {
     public void setDevise(Devise devise) {
         this.devise = devise;
     }
+
+
 
 }
