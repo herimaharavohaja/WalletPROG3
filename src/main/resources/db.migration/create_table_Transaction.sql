@@ -1,8 +1,10 @@
-CREATE TABLE Transaction (
-    ID SERIAL PRIMARY KEY,
-    Label VARCHAR(100),
-    Montant DECIMAL(15, 2),
-    Date_heure TIMESTAMP,
-    type VARCHAR (50),
-    Compte_ID INT REFERENCES Compte(ID)
+CREATE TABLE IF NOT EXISTS "transaction"
+(
+    transaction_id        SERIAL PRIMARY KEY,
+    label                 VARCHAR(255)                        NOT NULL,
+    amount                DOUBLE PRECISION                    NOT NULL,
+    transaction_date_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    account_id            INT                                 NOT NULL,
+    transaction_type      "transaction_type"                  NOT NULL,
+    FOREIGN KEY (account_id) REFERENCES account (account_id)
 );

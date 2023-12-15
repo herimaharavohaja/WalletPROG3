@@ -1,96 +1,91 @@
-package org.example.Repository;
 
-import org.example.Connection.ConnectionDatabase;
-import org.example.Model.CurrencyValue;
+public class CurrencyValueRepository implements com.walletbyhei.repository.InterfaceRepository<CurrencyValue> {
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+  @Override
+  public Account findById(int toFind) {
+    return null;
+  }
 
-public class CurrencyValueRepository {
-    private Connection connection;
+  @Override
+  public List<CurrencyValue> findAll() {
+    return null;
+  }
 
-    public CurrencyValueRepository() throws SQLException {
-        this.connection = new ConnectionDatabase().getConnection();
-    }
+  @Override
+  public List<CurrencyValue> saveAll(List<CurrencyValue> toSave) {
+    return null;
+  }
 
-    public void create(CurrencyValue currencyValue) throws SQLException {
-        String query = "INSERT INTO CurrencyValue (DeviseSource_ID, DeviseDestination_ID, Montant, DateEffet) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setInt(1, currencyValue.getDeviseSourceId());
-            statement.setInt(2, currencyValue.getDeviseDestinationId());
-            statement.setBigDecimal(3, currencyValue.getMontant());
-            statement.setTimestamp(4, Timestamp.valueOf(currencyValue.getDateEffet()));
+  @Override
+  public CurrencyValue save(CurrencyValue toSave) {
+    return null;
+  }
 
-            statement.executeUpdate();
-            ResultSet generatedKeys = statement.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                currencyValue.setId(generatedKeys.getInt(1));
-            } else {
-                throw new SQLException("Creating CurrencyValue failed, no ID obtained.");
-            }
+  @Override
+  public CurrencyValue delete(CurrencyValue toDelete) {
+    return null;
+  }
+
+  @Override
+  public void closeResources(Connection connection, PreparedStatement statement, ResultSet resultSet) {
+
+  }
+
+  public double getConversionRate(Long sourceCurrencyId, Long destinationCurrencyId, LocalDate date) {
+    Connection connection = ConnectionToDb.getConnection();
+    String QUERY = "SELECT value " +
+        "FROM currency_value " +
+        "WHERE currency_value_id = ? AND destination_currency_id = ? AND effective_date <= ? " +
+        "ORDER BY effective_date DESC LIMIT 1";
+
+    try (
+        PreparedStatement statement = connection.prepareStatement(QUERY)) {
+      statement.setLong(1, sourceCurrencyId);
+      statement.setLong(2, destinationCurrencyId);
+      statement.setDate(3, java.sql.Date.valueOf(date));
+
+      try (ResultSet resultSet = statement.executeQuery()) {
+        if (resultSet.next()) {
+          return resultSet.getDouble("amount");
         }
+      }
+    } catch (SQLException e) {
+      throw new RuntimeException("Failed to fetch conversion rate: " + e.getMessage());
     }
-    public void update(CurrencyValue currencyValue) throws SQLException {
-        String query = "UPDATE CurrencyValue SET DeviseSource_ID = ?, DeviseDestination_ID = ?, Montant = ?, DateEffet = ? WHERE ID = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, currencyValue.getDeviseSourceId());
-            statement.setInt(2, currencyValue.getDeviseDestinationId());
-            statement.setBigDecimal(3, currencyValue.getMontant());
-            statement.setTimestamp(4, Timestamp.valueOf(currencyValue.getDateEffet()));
-            statement.setInt(5, currencyValue.getId());
 
-            statement.executeUpdate();
+    throw new RuntimeException("Conversion rate not found for given currencies and date");
+  }
+
+  public List<CurrencyValue> retrieveCurrencyValuesForDay(LocalDate date) {
+    Connection connection = ConnectionToDb.getConnection();
+    List<CurrencyValue> currencyValues = new ArrayList<>();
+
+    String QUERY = "SELECT * FROM currency_value WHERE DATE(effective_date) = ?";
+
+    try (PreparedStatement statement = connection.prepareStatement(QUERY)) {
+      statement.setDate(1, java.sql.Date.valueOf(date));
+
+      try (ResultSet resultSet = statement.executeQuery()) {
+        while (resultSet.next()) {
+          long currencyValueId = resultSet.getLong("currency_value_id");
+          int sourceCurrencyId = resultSet.getInt("source_currency_id");
+          int destinationCurrencyId = resultSet.getInt("destination_currency_id");
+          double amount = resultSet.getDouble("amount");
+          LocalDate effectiveDate = resultSet.getDate("effective_date").toLocalDate();
+
+          CurrencyValue currencyValue = new CurrencyValue(
+              currencyValueId,
+              sourceCurrencyId,
+              destinationCurrencyId,
+              amount,
+              effectiveDate);
+          currencyValues.add(currencyValue);
         }
+      }
+    } catch (SQLException e) {
+      throw new RuntimeException("Failed to retrieve currency value for the day : " + e.getMessage());
     }
 
-    public CurrencyValue getById(int id) throws SQLException {
-        String query = "SELECT * FROM CurrencyValue WHERE ID = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return mapResultSetToCurrencyValue(resultSet);
-            }
-        }
-        return null;
-    }
-
-    public List<CurrencyValue> getAll() throws SQLException {
-        List<CurrencyValue> currencyValues = new ArrayList<>();
-        String query = "SELECT * FROM CurrencyValue";
-        try (Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
-            while (resultSet.next()) {
-                currencyValues.add(mapResultSetToCurrencyValue(resultSet));
-            }
-        }
-        return currencyValues;
-    }
-    public List<CurrencyValue> getAllPagination(int pageNumber) throws SQLException {
-        List<CurrencyValue> currencyValues = new ArrayList<>();
-        int limit = 10;
-        int offset = (pageNumber - 1) * limit;
-
-        String query = "SELECT * FROM CurrencyValue LIMIT ? OFFSET ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, limit);
-            statement.setInt(2, offset);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                currencyValues.add(mapResultSetToCurrencyValue(resultSet));
-            }
-        }
-        return currencyValues;
-    }
-    private CurrencyValue mapResultSetToCurrencyValue(ResultSet resultSet) throws SQLException {
-        CurrencyValue currencyValue = new CurrencyValue();
-        currencyValue.setId(resultSet.getInt("ID"));
-        currencyValue.setDeviseSourceId(resultSet.getInt("DeviseSource_ID"));
-        currencyValue.setDeviseDestinationId(resultSet.getInt("DeviseDestination_ID"));
-        currencyValue.setMontant(resultSet.getBigDecimal("Montant"));
-        currencyValue.setDateEffet(resultSet.getTimestamp("DateEffet").toLocalDateTime());
-        return currencyValue;
-    }
-
+    return currencyValues;
+  }
 }

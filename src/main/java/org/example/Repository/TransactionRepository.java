@@ -1,102 +1,129 @@
-package org.example.Repository;
 
-import org.example.Connection.ConnectionDatabase;
-import org.example.Model.Account;
-import org.example.Model.Transaction;
-import org.example.Model.TransactionType;
+public class TransactionRepository implements com.walletbyhei.repository.InterfaceRepository<Transaction> {
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+  @Override
+  public Account findById(int toFind) {
+    return null;
+  }
 
-public class TransactionRepository {
-    private Connection connection;
+  @Override
+  public List<Transaction> findAll() {
+    List<Transaction> transactions = new ArrayList<>();
 
-    public TransactionRepository() throws SQLException {
-        this.connection = new ConnectionDatabase().getConnection();
-    }
+    Connection connection = ConnectionToDb.getConnection();
+    String SELECT_ALL_QUERY = "SELECT * FROM \"transaction\"";
 
-    public void create(Transaction transaction) throws SQLException {
-        String query = "INSERT INTO Transaction (Label, Montant, Date_heure, Type, Compte_ID) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, transaction.getLabel());
-            statement.setBigDecimal(2, transaction.getMontant());
-            statement.setTimestamp(3, Timestamp.valueOf(transaction.getDateHeure()));
-            statement.setString(4, transaction.getTransactionType().toString());
-            statement.setInt(5, transaction.getAccount().getId());
+    try (PreparedStatement statement = connection.prepareStatement(SELECT_ALL_QUERY)) {
+      ResultSet resultSet = statement.executeQuery();
 
-            statement.executeUpdate();
-            ResultSet generatedKeys = statement.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                transaction.setId(generatedKeys.getInt(1));
-            } else {
-                throw new SQLException("Creating Transaction failed, no ID obtained.");
-            }
-        }
-    }
-    public void update(Transaction transaction) throws SQLException {
-        String query = "UPDATE Transaction SET Label = ?, Montant = ?, Date_heure = ?, Type = ?, Compte_ID = ? WHERE ID = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, transaction.getLabel());
-            statement.setBigDecimal(2, transaction.getMontant());
-            statement.setTimestamp(3, Timestamp.valueOf(transaction.getDateHeure()));
-            statement.setString(4, transaction.getTransactionType().toString());
-            statement.setInt(5, transaction.getAccount().getId());
-            statement.setInt(6, transaction.getId());
-
-            statement.executeUpdate();
-        }
-    }
-    public Transaction getById(int id) throws SQLException {
-        String query = "SELECT * FROM Transaction WHERE ID = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return mapResultSetToTransaction(resultSet);
-            }
-        }
-        return null;
-    }
-    public List<Transaction> getAll() throws SQLException {
-        List<Transaction> transactions = new ArrayList<>();
-        String query = "SELECT * FROM Transaction";
-        try (Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
-            while (resultSet.next()) {
-                transactions.add(mapResultSetToTransaction(resultSet));
-            }
-        }
-        return transactions;
-    }
-    public List<Transaction> getAllPagination(int pageNumber) throws SQLException {
-        List<Transaction> transactions = new ArrayList<>();
-        int limit = 10;
-        int offset = (pageNumber - 1) * limit;
-
-        String query = "SELECT * FROM Transaction LIMIT ? OFFSET ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, limit);
-            statement.setInt(2, offset);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                transactions.add(mapResultSetToTransaction(resultSet));
-            }
-        }
-        return transactions;
-    }
-    private Transaction mapResultSetToTransaction(ResultSet resultSet) throws SQLException {
+      while (resultSet.next()) {
         Transaction transaction = new Transaction();
-        transaction.setId(resultSet.getInt("ID"));
-        transaction.setLabel(resultSet.getString("Label"));
-        transaction.setMontant(resultSet.getBigDecimal("Montant"));
-        transaction.setDateHeure(resultSet.getTimestamp("Date_heure").toLocalDateTime());
-        transaction.setTransactionType(TransactionType.valueOf(resultSet.getString("Type")));
-
-        Account account = new Account();
-        account.setId(resultSet.getInt("Compte_ID"));
-        transaction.setAccount(account);
-
-        return transaction;
+        transactions.add(transaction);
+      }
+    } catch (SQLException e) {
+      throw new RuntimeException("Failed to retrieve all transactions : " + e.getMessage());
+    } finally {
+      closeResources(connection, null, null);
     }
+    return transactions;
+  }
+
+  @Override
+  public List<Transaction> saveAll(List<Transaction> toSave) {
+    List<Transaction> savedTransactions = new ArrayList<>();
+
+    for (Transaction transaction : toSave) {
+      Transaction savedTransaction = this.save(transaction);
+      savedTransactions.add(savedTransaction);
+    }
+
+    return savedTransactions;
+  }
+
+  @Override
+  public Transaction save(Transaction toSave) {
+    Connection connection = null;
+    PreparedStatement statement = null;
+    ResultSet resultSet = null;
+
+    try {
+      connection = ConnectionToDb.getConnection();
+      String SAVE_QUERY;
+
+      if (toSave.getTransactionId() == null) {
+        SAVE_QUERY =
+            "INSERT INTO \"transaction\" (label, amount, transaction_date_time, account_id,"
+                + " transaction_type) VALUES(?, ?, ?, ?, CAST(? AS transaction_type)) RETURNING *";
+        statement = connection.prepareStatement(SAVE_QUERY, Statement.RETURN_GENERATED_KEYS);
+        statement.setString(1, toSave.getLabel());
+        statement.setDouble(2, toSave.getAmount());
+        statement.setTimestamp(3, Timestamp.valueOf(toSave.getDateTime()));
+        statement.setInt(4, Math.toIntExact(toSave.getAccount().getAccountId()));
+        statement.setString(5, String.valueOf(toSave.getTransactionType()));
+        statement.executeUpdate();
+
+        resultSet = statement.getGeneratedKeys();
+      } else {
+        SAVE_QUERY =
+            "UPDATE \"transaction\" SET label = ?, amount = ?, transaction_date_time = ?,"
+                + " account_id = ? , transaction_type = CAST(? AS account_type)WHERE transaction_id"
+                + " = ? RETURNING *";
+        statement = connection.prepareStatement(SAVE_QUERY);
+        statement.setString(1, toSave.getLabel());
+        statement.setDouble(2, toSave.getAmount());
+        statement.setTimestamp(3, Timestamp.valueOf(toSave.getDateTime()));
+        statement.setInt(4, Math.toIntExact(toSave.getAccount().getAccountId()));
+        statement.setString(5, String.valueOf(toSave.getTransactionType()));
+        statement.setLong(6, toSave.getTransactionId());
+        statement.executeUpdate();
+      }
+
+      if (resultSet != null && resultSet.next()) {
+        toSave.setTransactionId(resultSet.getLong(1));
+      }
+    } catch (SQLException e) {
+      throw new RuntimeException("Failed to save transaction : " + e.getMessage());
+    } finally {
+      closeResources(connection, statement, resultSet);
+    }
+    return toSave;
+  }
+
+  @Override
+  public Transaction delete(Transaction toDelete) {
+    Connection connection = null;
+    PreparedStatement statement = null;
+
+    try {
+      connection = ConnectionToDb.getConnection();
+      String DELETE_QUERY = "DELETE FROM \"transaction\" WHERE transaction_id = ?";
+      statement = connection.prepareStatement(DELETE_QUERY);
+      statement.setLong(1, toDelete.getTransactionId());
+      statement.executeUpdate();
+
+    } catch (SQLException e) {
+      throw new RuntimeException("Failed to delete transaction : " + e.getMessage());
+    } finally {
+      closeResources(connection, statement, null);
+    }
+    return toDelete;
+  }
+
+  @Override
+  public void closeResources(
+      Connection connection, PreparedStatement statement, ResultSet resultSet) {
+    try {
+      if (resultSet != null) {
+        resultSet.close();
+      }
+      if (statement != null) {
+        statement.close();
+      }
+      if (connection != null) {
+        connection.close();
+      }
+    } catch (SQLException e) {
+      throw new RuntimeException("Failed to close resources: " + e.getMessage());
+    }
+  }
 }

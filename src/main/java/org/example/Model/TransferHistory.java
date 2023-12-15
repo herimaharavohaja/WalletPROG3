@@ -1,55 +1,74 @@
-package org.example.Model;
-
+package com.walletbyhei.model;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class TransferHistory {
-    private int id;
-    private int transferId;
-    private LocalDateTime dateTransfert;
+  private Long transferHistoryId;
+  private Account debitTransaction;
+  private Account creditTransaction;
+  private Double amount;
+  private LocalDateTime transferDate;
 
-    @Override
-    public String toString() {
-        return "TransferHistory{" +
-                "id=" + id +
-                ", transferId=" + transferId +
-                ", dateTransfert=" + dateTransfert +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "TransferHistory{" +
+            "transferHistoryId=" + transferHistoryId +
+            ", debitTransaction=" + debitTransaction +
+            ", creditTransaction=" + creditTransaction +
+            ", amount=" + amount +
+            ", transferDate=" + transferDate +
+            '}';
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof TransferHistory that)) return false;
-        return id == that.id && transferId == that.transferId && Objects.equals(dateTransfert, that.dateTransfert);
-    }
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof TransferHistory that)) return false;
+    return Objects.equals(transferHistoryId, that.transferHistoryId) && Objects.equals(debitTransaction, that.debitTransaction) && Objects.equals(creditTransaction, that.creditTransaction) && Objects.equals(amount, that.amount) && Objects.equals(transferDate, that.transferDate);
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, transferId, dateTransfert);
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(transferHistoryId, debitTransaction, creditTransaction, amount, transferDate);
+  }
 
-    public int getId() {
-        return id;
-    }
+  public Long getTransferHistoryId() {
+    return transferHistoryId;
+  }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+  public void setTransferHistoryId(Long transferHistoryId) {
+    this.transferHistoryId = transferHistoryId;
+  }
 
-    public int getTransferId() {
-        return transferId;
-    }
+  public Account getDebitTransaction() {
+    return debitTransaction;
+  }
 
-    public void setTransferId(int transferId) {
-        this.transferId = transferId;
-    }
+  public void setDebitTransaction(Account debitTransaction) {
+    this.debitTransaction = debitTransaction;
+  }
 
-    public LocalDateTime getDateTransfert() {
-        return dateTransfert;
-    }
+  public Account getCreditTransaction() {
+    return creditTransaction;
+  }
 
-    public void setDateTransfert(LocalDateTime dateTransfert) {
-        this.dateTransfert = dateTransfert;
-    }
+  public void setCreditTransaction(Account creditTransaction) {
+    this.creditTransaction = creditTransaction;
+  }
+
+  public Double getAmount() {
+    return amount;
+  }
+
+  public void setAmount(Double amount) {
+    this.amount = amount;
+  }
+
+  public LocalDateTime getTransferDate() {
+    return transferDate;
+  }
+
+  public void setTransferDate(LocalDateTime transferDate) {
+    this.transferDate = transferDate;
+  }
 }

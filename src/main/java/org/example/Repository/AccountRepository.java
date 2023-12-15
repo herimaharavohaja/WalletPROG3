@@ -1,105 +1,83 @@
-package org.example.Repository;
-
 import org.example.Connection.ConnectionDatabase;
-import org.example.Model.Account;
-import org.example.Model.AccountType;
-import org.example.Model.Devise;
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
-public class AccountRepository {
-    private Connection connection;
+public class AccountRepository implements com.walletbyhei.repository.InterfaceRepository<Account> {
 
-    public AccountRepository() throws SQLException {
-        this.connection = new ConnectionDatabase().getConnection();
+  // ... Autres méthodes
+
+  @Override
+  public Account findById(int toFind) {
+    String SELECT_BY_ID_QUERY = "SELECT * FROM account WHERE account_id = ?";
+    Connection connection = ConnectionDatabase.getConnection();
+
+    try (PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID_QUERY)) {
+      statement.setLong(1, toFind);
+      ResultSet resultSet = statement.executeQuery();
+
+      if (resultSet.next()) {
+        // Utilisation du constructeur sans paramètres pour créer un nouvel Account
+        return new Account();
+      }
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
     }
+    return null;
+  }
 
-    public void create(Account account) throws SQLException {
-        String query = "INSERT INTO Account (Nom, Solde, Date_maj_solde, Devise_ID) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, account.getNom());
-            statement.setBigDecimal(2, account.getSolde());
-            statement.setTimestamp(3, Timestamp.valueOf(account.getDateMajSolde()));
-            statement.setString(4, account.getTypeAccount().toString());
-            statement.setInt(5, account.getDevise().getId());
+  @Override
+  public List<Account> findAll() {
+    List<Account> accounts = new ArrayList<>();
 
-            statement.executeUpdate();
-            ResultSet generatedKeys = statement.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                account.setId(generatedKeys.getInt(1));
-            } else {
-                throw new SQLException("Creating Account failed, no ID obtained.");
-            }
-        }
-    }
-    public void update(Account account) throws SQLException {
-        String query = "UPDATE Account SET Nom = ?, Solde = ?, Date_maj_solde = ?, Devise_ID = ? WHERE ID = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, account.getNom());
-            statement.setBigDecimal(2, account.getSolde());
-            statement.setTimestamp(3, Timestamp.valueOf(account.getDateMajSolde()));
-            statement.setString(5, account.getTypeAccount().toString());
-            statement.setInt(4, account.getDevise().getId());
-            statement.setInt(5, account.getId());
+    Connection connection = ConnectionToDb.getConnection();
+    String SELECT_ALL_QUERY = "SELECT * FROM account";
 
-            statement.executeUpdate();
-        }
-    }
+    try (PreparedStatement statement = connection.prepareStatement(SELECT_ALL_QUERY)) {
+      ResultSet resultSet = statement.executeQuery();
 
-
-    public Account getById(int id) throws SQLException {
-        String query = "SELECT * FROM Account WHERE ID = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return mapResultSetToCompte(resultSet);
-            }
-        }
-        return null;
-    }
-
-    public List<Account> getAll() throws SQLException {
-        List<Account> comptes = new ArrayList<>();
-        String query = "SELECT * FROM Account";
-        try (Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
-            while (resultSet.next()) {
-                comptes.add(mapResultSetToCompte(resultSet));
-            }
-        }
-        return comptes;
-    }
-
-    public List<Account> getAllPagination(int offset, int limit) throws SQLException {
-        List<Account> comptes = new ArrayList<>();
-        String query = "SELECT * FROM Account LIMIT ? OFFSET ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, limit);
-            statement.setInt(2, offset);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                comptes.add(mapResultSetToCompte(resultSet));
-            }
-        }
-        return comptes;
-    }
-
-
-    private Account mapResultSetToCompte(ResultSet resultSet) throws SQLException {
+      while (resultSet.next()) {
+        // Utilisation du constructeur sans paramètres pour créer un nouvel Account
         Account account = new Account();
-        account.setId(resultSet.getInt("ID"));
-        account.setNom(resultSet.getString("Nom"));
-        account.setSolde(resultSet.getBigDecimal("Solde"));
-        account.setDateMajSolde(resultSet.getTimestamp("Date_maj_solde").toLocalDateTime());
-        account.setTypeAccount(AccountType.valueOf(resultSet.getString("Type").toString()));
-
-        Devise devise = new Devise();
-        devise.setId(resultSet.getInt("Devise_ID"));
-        account.setDevise(devise);
-        return account;
+        accounts.add(account);
+      }
+    } catch (SQLException e) {
+      throw new RuntimeException("Failed to retrieve all account : " + e.getMessage());
+    } finally {
+      closeResources(connection, null, null);
     }
+    return accounts;
+  }
+
+  @Override
+  public Account save(Account toSave) {
+    Connection connection = null;
+    PreparedStatement statement = null;
+    ResultSet resultSet = null;
+
+    try {
+      connection = ConnectionToDb.getConnection();
+      connection.setAutoCommit(false); // Début de la transaction
+
+      // Reste du code pour la sauvegarde de l'Account...
+
+      connection.commit(); // Validation de la transaction après la sauvegarde
+
+    } catch (SQLException e) {
+      try {
+        if (connection != null) {
+          connection.rollback(); // Annulation de la transaction en cas d'échec
+        }
+      } catch (SQLException ex) {
+        throw new RuntimeException("Failed to rollback transaction: " + ex.getMessage());
+      }
+      throw new RuntimeException("Failed to save account: " + e.getMessage());
+    } finally {
+      closeResources(connection, statement, resultSet);
+    }
+    return toSave;
+  }
+
 
 }

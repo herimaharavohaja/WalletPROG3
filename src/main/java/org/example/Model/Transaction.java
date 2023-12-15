@@ -1,87 +1,95 @@
-package org.example.Model;
+package com.walletbyhei.model;
 
-import java.math.BigDecimal;
+import com.walletbyhei.model.type.TransactionType;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Objects;
 
 public class Transaction {
-    private int Id;
-    private String label;
-    private BigDecimal montant;
-    private LocalDateTime dateHeure;
-    private TransactionType transactionType;
-    private Account account;
+  private Long transactionId;
+  private String label;
+  private Double amount;
+  private LocalDateTime dateTime;
+  private TransactionType transactionType;
+  private Account account;
 
-    @Override
-    public String toString() {
-        return "Transaction{" +
-                "Id=" + Id +
-                ", label='" + label + '\'' +
-                ", montant=" + montant +
-                ", dateHeure=" + dateHeure +
-                ", transactionType=" + transactionType +
-                ", account=" + account +
-                '}';
-    }
+  public Transaction(Long transactionId, String label, Double amount, LocalDateTime dateTime, TransactionType transactionType, Account account) {
+    this.transactionId = transactionId;
+    this.label = label;
+    this.amount = amount;
+    this.dateTime = dateTime;
+    this.transactionType = transactionType;
+    this.account = account;
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Transaction that)) return false;
-        return Id == that.Id && Objects.equals(label, that.label) && Objects.equals(montant, that.montant) && Objects.equals(dateHeure, that.dateHeure) && transactionType == that.transactionType && Objects.equals(account, that.account);
-    }
+  @Override
+  public String toString() {
+    return "Transaction{" +
+            "transactionId=" + transactionId +
+            ", label='" + label + '\'' +
+            ", amount=" + amount +
+            ", dateTime=" + dateTime +
+            ", transactionType=" + transactionType +
+            ", account=" + account +
+            '}';
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(Id, label, montant, dateHeure, transactionType, account);
-    }
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Transaction that)) return false;
+    return Objects.equals(transactionId, that.transactionId) && Objects.equals(label, that.label) && Objects.equals(amount, that.amount) && Objects.equals(dateTime, that.dateTime) && transactionType == that.transactionType && Objects.equals(account, that.account);
+  }
 
-    public int getId() {
-        return Id;
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(transactionId, label, amount, dateTime, transactionType, account);
+  }
 
-    public void setId(int id) {
-        Id = id;
-    }
+  public Long getTransactionId() {
+    return transactionId;
+  }
 
-    public String getLabel() {
-        return label;
-    }
+  public void setTransactionId(Long transactionId) {
+    this.transactionId = transactionId;
+  }
 
-    public void setLabel(String label) {
-        this.label = label;
-    }
+  public String getLabel() {
+    return label;
+  }
 
-    public BigDecimal getMontant() {
-        return montant;
-    }
+  public void setLabel(String label) {
+    this.label = label;
+  }
 
-    public void setMontant(BigDecimal montant) {
-        this.montant = montant;
-    }
+  public Double getAmount() {
+    return amount;
+  }
 
-    public LocalDateTime getDateHeure() {
-        return dateHeure;
-    }
+  public void setAmount(Double amount) {
+    this.amount = amount;
+  }
 
-    public void setDateHeure(LocalDateTime dateHeure) {
-        this.dateHeure = dateHeure;
-    }
+  public LocalDateTime getDateTime() {
+    return dateTime;
+  }
 
-    public TransactionType getTransactionType() {
-        return transactionType;
-    }
+  public void setDateTime(LocalDateTime dateTime) {
+    this.dateTime = dateTime;
+  }
 
-    public void setTransactionType(TransactionType transactionType) {
-        this.transactionType = transactionType;
-    }
+  public TransactionType getTransactionType() {
+    return transactionType;
+  }
 
-    public Account getAccount() {
-        return account;
-    }
+  public void setTransactionType(TransactionType transactionType) {
+    this.transactionType = transactionType;
+  }
 
-    public void setAccount(Account account) {
-        this.account = account;
-    }
+  public Account getAccount() {
+    return account;
+  }
+
+  public void setAccount(Account account) {
+    this.account = account;
+  }
 }
