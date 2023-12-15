@@ -10,7 +10,7 @@ public class Transaction {
     private String label;
     private Double amount;
     private LocalDateTime dateTime;
-    private com.walletbyhei.model.type.TransactionType transactionType;
+    private TransactionType transactionType;
     private Account account;
 
     public Transaction(Long transactionId, String label, Double amount, LocalDateTime dateTime, TransactionType transactionType, Account account) {

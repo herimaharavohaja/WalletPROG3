@@ -81,7 +81,6 @@ public class CurrencyRepository implements InterfaceRepository<Currency> {
             }
 
             if (resultSet != null && resultSet.next()) {
-                // Mise à jour de l'ID généré lors de l'insertion
                 toSave.setCurrencyId(resultSet.getLong(1));
             }
         } catch (SQLException e) {
