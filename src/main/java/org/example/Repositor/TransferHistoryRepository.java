@@ -12,7 +12,7 @@ import java.util.List;
 public class TransferHistoryRepository implements InterfaceRepository<TransferHistory> {
 
     @Override
-    public Account findById(int toFind) {
+    public TransferHistory findById(int toFind) {
         return null;
     }
 
@@ -31,7 +31,6 @@ public class TransferHistoryRepository implements InterfaceRepository<TransferHi
 
             while (resultSet.next()) {
                 TransferHistory transferHistory = new TransferHistory();
-                // Populate transferHistory object with resultSet data
                 transferHistories.add(transferHistory);
             }
         } catch (SQLException e) {

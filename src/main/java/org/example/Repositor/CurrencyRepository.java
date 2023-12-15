@@ -1,14 +1,16 @@
 package org.example.repository;
 
 import org.example.Connection.ConnectionDatabase;
+import org.example.Models.Account;
 import org.example.Models.Currency;
+import org.example.Repositor.InterfaceRepository;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CurrencyRepository implements InterfaceRepository<Currency> {
-     ConnectionDatabase connectionDatabase = new ConnectionDatabase();
+
     @Override
     public Currency findById(int toFind) {
         return null;
@@ -25,7 +27,6 @@ public class CurrencyRepository implements InterfaceRepository<Currency> {
 
             while (resultSet.next()) {
                 Currency currency = new Currency();
-                // Remplir les détails de Currency à partir du ResultSet
                 currency.setCurrencyId(resultSet.getLong("currency_id"));
                 currency.setCurrencyName(resultSet.getString("currency_name"));
                 currency.setCurrencyCode(resultSet.getString("currency_code"));
@@ -89,26 +90,6 @@ public class CurrencyRepository implements InterfaceRepository<Currency> {
             closeResources(connection, statement, resultSet);
         }
         return toSave;
-    }
-
-    @Override
-    public Currency delete(Currency toDelete) {
-        Connection connection = null;
-        PreparedStatement statement = null;
-
-        try {
-            connection = ConnectionDatabase.getConnection();
-            String DELETE_QUERY = "DELETE FROM currency WHERE currency_id = ?";
-            statement = connection.prepareStatement(DELETE_QUERY);
-            statement.setLong(1, toDelete.getCurrencyId());
-            statement.executeUpdate();
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to delete currency: " + e.getMessage());
-        } finally {
-            closeResources(connection, statement, null);
-        }
-        return toDelete;
     }
 
     @Override

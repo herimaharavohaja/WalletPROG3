@@ -1,7 +1,7 @@
 package org.example.repository;
-
 import org.example.Connection.ConnectionDatabase;
 import org.example.Models.Transaction;
+import org.example.Repositor.InterfaceRepository;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -26,7 +26,6 @@ public class TransactionRepository implements InterfaceRepository<Transaction> {
 
             while (resultSet.next()) {
                 Transaction transaction = new Transaction();
-                // Remplir les détails de Transaction à partir du ResultSet
                 transactions.add(transaction);
             }
         } catch (SQLException e) {

@@ -11,7 +11,6 @@ import java.util.List;
 
 public class CurrancyValueRepository implements InterfaceRepository<CurrencyValue> {
     @Override
-    @Override
     public Account findById(int toFind) {
         return null;
     }
@@ -31,10 +30,6 @@ public class CurrancyValueRepository implements InterfaceRepository<CurrencyValu
         return null;
     }
 
-    @Override
-    public CurrencyValue delete(CurrencyValue toDelete) {
-        return null;
-    }
 
     @Override
     public void closeResources(Connection connection, PreparedStatement statement, ResultSet resultSet) {
@@ -67,7 +62,7 @@ public class CurrancyValueRepository implements InterfaceRepository<CurrencyValu
     }
 
     public List<CurrencyValue> retrieveCurrencyValuesForDay(LocalDate date) {
-        Connection connection = ConnectionToDb.getConnection();
+        Connection connection = ConnectionDatabase.getConnection();
         List<CurrencyValue> currencyValues = new ArrayList<>();
 
         String QUERY = "SELECT * FROM currency_value WHERE DATE(effective_date) = ?";
